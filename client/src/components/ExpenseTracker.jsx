@@ -6,38 +6,11 @@ import StateDemo from './StateDemo.jsx';
 
 export default function ExpenseTracker() {
   const [expenses, setExpenses] = useState([]);
-  //   {
-  //     id: 1,
-  //     title: 'Lunch',
-  //     amount: 250,
-  //     category: 'Food',
-  //     date: '2026-07-10',
-  //     paymentMode: 'UPI',
-  //     note: 'Lunch with friends'
-  //   },
-  //   {
-  //     id: 2,
-  //     title: 'Bus Ticket',
-  //     amount: 100,
-  //     category: 'Travel',
-  //     date: '2026-07-11',
-  //     paymentMode: 'Cash',
-  //     note: 'College travel'
-  //   },
-  //   {
-  //     id: 3,
-  //     title: 'Movie Ticket',
-  //     amount: 300,
-  //     category: 'Entertainment',
-  //     date: '2026-07-12',
-  //     paymentMode: 'Card',
-  //     note: 'Weekend movie'
-  //   }
-  // ]);
   const [showSummary, setShowSummary] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedExpense, setSelectedExpense] = useState(null);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [sortBy, setSortBy] = useState("none");
 
   // Level 4
   function addExpense(newExpense) {
@@ -65,11 +38,63 @@ function editExpense(expense) {
   setSelectedExpense(expense);
   setIsEditMode(true);
 }
+function selectExpense(expense) {
+  setSelectedExpense(expense);
+}
+const filteredExpenses =
+  selectedCategory === "All"
+    ? expenses
+    : expenses.filter(
+        (expense) => expense.category === selectedCategory
+);
+const sortedExpenses = [...filteredExpenses];
+if (sortBy === "amount") {
+  sortedExpenses.sort((a, b) => a.amount - b.amount);
+}
+
+if (sortBy === "date") {
+  sortedExpenses.sort(
+    (a, b) => new Date(a.date) - new Date(b.date)
+  );
+}
+
+const totalExpense = expenses.reduce((total, expense) => {
+  return expense.type === "Expense"
+    ? total + expense.amount
+    : total;
+}, 0);
+
+const totalIncome = expenses.reduce((total, expense) => {
+  return expense.type === "Income"
+    ? total + expense.amount
+    : total;
+}, 0);
+
+const currentBalance = totalIncome - totalExpense;
+const totalExpensesCount = expenses.length;
+const expenseTransactions = expenses.filter(
+  (expense) => expense.type === "Expense"
+);
+const highestExpense =
+  expenseTransactions.length > 0
+    ? expenseTransactions.reduce((max, expense) =>
+        expense.amount > max.amount ? expense : max
+)
+: null;
+
+const categoryTotals = expenses.reduce((totals, expense) => {
+  if (expense.type === "Expense") {
+    totals[expense.category] =
+      (totals[expense.category] || 0) + expense.amount;
+  }
+  return totals;
+}, {});
+
 return (
   <div>
     <h1>Expense Tracker</h1>
   <AddExpenseForm
-  addExpense={addExpense}
+  onAddExpense={addExpense}
   updateExpense={updateExpense}
   isEditMode={isEditMode}
   selectedExpense={selectedExpense}
@@ -85,10 +110,81 @@ return (
     {showSummary && (
       <ExpenseSummary expenses={expenses} />
     )}
+     
+    <div className="financial-summary">
+    <h3>Financial Summary</h3>
+     <p>Total Income: ₹{totalIncome}</p>
+     <p>Total Expense: ₹{totalExpense}</p>
+     <p>Current Balance: ₹{currentBalance}</p>
+    </div>
+    <p>Total Number of Expenses: {totalExpensesCount}</p>
+    <p>
+    Highest Expense:
+    {highestExpense
+    ? ` ${highestExpense.title} - ₹${highestExpense.amount}`
+    : " No Expense"}
+    </p>
+    
+    <h3>Category-wise Totals</h3>
+    <ul>
+    {Object.entries(categoryTotals).map(([category, total]) => (
+    <li key={category}>
+      {category}: ₹{total}
+    </li>
+    ))}
+    </ul>
+
+    {selectedExpense && (              //level 7
+    <div className="expense-preview">
+    <h3>Selected Expense</h3>
+    <p><strong>Title:</strong> {selectedExpense.title}</p>
+    <p><strong>Amount:</strong> ₹{selectedExpense.amount}</p>
+    <p><strong>Category:</strong> {selectedExpense.category}</p>
+    <p><strong>Date:</strong> {selectedExpense.date}</p>
+    <p><strong>Payment Mode:</strong> {selectedExpense.paymentMode}</p>
+    <p><strong>Note:</strong> {selectedExpense.note}</p>
+    </div>
+     )}
+    
+    <h3>Sort Expenses</h3>
+    <button onClick={() => setSortBy("amount")}>
+    Sort by Amount
+    </button>
+    <button onClick={() => setSortBy("date")}>
+    Sort by Date
+    </button>
+    <button onClick={() => setSortBy("none")}>
+    Clear Sorting
+    </button>
+
+     <h3>Filter by Category</h3>
+    <button onClick={() => setSelectedCategory("All")}>
+    All
+    </button>
+    <button onClick={() => setSelectedCategory("Food")}>
+    Food
+    </button>
+    <button onClick={() => setSelectedCategory("Travel")}>
+    Travel
+    </button>
+    <button onClick={() => setSelectedCategory("Shopping")}>
+    Shopping
+    </button>
+    <button onClick={() => setSelectedCategory("Bills")}>
+    Bills
+    </button>
+   <button onClick={() => setSelectedCategory("Other")}>
+    Other
+    </button>
+    <button onClick={() => setSelectedCategory("All")}>
+    Clear Filter
+    </button>
+
     <ExpenseList
-     expenses={expenses}
-     deleteExpense={deleteExpense}
-     editExpense={editExpense}
+     expenses={sortedExpenses}
+     onDeleteExpense={deleteExpense}
+     onEditExpense={editExpense}
+     onSelectExpense={selectExpense}
     />
     <StateDemo />
   </div>

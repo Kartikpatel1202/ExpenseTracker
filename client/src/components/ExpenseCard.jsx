@@ -1,4 +1,4 @@
-export default function ExpenseCard({ expense ,  deleteExpense , editExpense }) {
+export default function ExpenseCard({ expense ,  onDeleteExpense , onEditExpense , onSelectExpense}) {
   let badge = "";
   if (expense.category === "Food") {
     badge = "🍔 Food";
@@ -26,12 +26,12 @@ export default function ExpenseCard({ expense ,  deleteExpense , editExpense }) 
       <p>Payment Mode: {expense.paymentMode}</p>
       <p>Note: {expense.note}</p>
       <button
-       onClick={() => deleteExpense(expense.id)}
+       onClick={() => onDeleteExpense(expense.id)}
        >
        Delete
       </button>
       <button
-      onClick={() => editExpense(expense)}
+      onClick={() => {onSelectExpense(expense); onEditExpense(expense) }}
       >
       Edit
       </button>

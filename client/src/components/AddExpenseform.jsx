@@ -1,18 +1,20 @@
 import { useState } from 'react';
 import { useEffect } from "react";
-export default function AddExpenseForm({ addExpense , updateExpense, isEditMode , selectedExpense, setExpenses, setIsEditMode, setSelectedExpense }) {
+export default function AddExpenseForm({ onAddExpense , updateExpense, isEditMode , selectedExpense, setExpenses, setIsEditMode, setSelectedExpense }) {
   const [title, setTitle] = useState('');
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState('');
   const [date, setDate] = useState('');
   const [paymentMode, setPaymentMode] = useState('');
   const [note, setNote] = useState('');
+  const [type, setType] = useState("Expense");
   // New State for Error Message
   const [error, setError] = useState('');
-  useEffect(() => {
+useEffect(() => {
   if (selectedExpense) {
     setTitle(selectedExpense.title);
     setAmount(selectedExpense.amount);
+    setType(selectedExpense.type);
     setCategory(selectedExpense.category);
     setDate(selectedExpense.date);
     setPaymentMode(selectedExpense.paymentMode);
@@ -34,20 +36,23 @@ export default function AddExpenseForm({ addExpense , updateExpense, isEditMode 
     }
     // Remove error if validation passes
     setError("");
-    const newExpense = {
-      id: Date.now(),
-      title,
-      amount: Number(amount),
-      category,
-      date,
-      paymentMode,
-      note
-    };
+   const newExpense = {
+  id: Date.now(),
+  title,
+  amount: Number(amount),
+  type,
+  category,
+  date,
+  paymentMode,
+  note
+  };
+
 if (isEditMode) {
 const updatedExpense = {
   ...selectedExpense,
   title,
   amount: Number(amount),
+  type,
   category,
   date,
   paymentMode,
@@ -57,11 +62,12 @@ const updatedExpense = {
   setIsEditMode(false);
   setSelectedExpense(null);
 } else {
-  addExpense(newExpense);
+  onAddExpense(newExpense);
 }
     // Clear Form
     setTitle('');
     setAmount('');
+    setType("Expense");
     setCategory('');
     setDate('');
     setPaymentMode('');
@@ -88,6 +94,16 @@ const updatedExpense = {
             onChange={(event) => setAmount(event.target.value)}
             placeholder="Enter amount"
           />
+        </div>
+        <div>
+        <label>Type: </label>
+        <select
+         value={type}
+         onChange={(event) => setType(event.target.value)}
+         >
+        <option value="Expense">Expense</option>
+        <option value="Income">Income</option>
+        </select>
         </div>
         <div>
           <label>Category: </label>

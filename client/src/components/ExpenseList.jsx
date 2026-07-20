@@ -1,5 +1,5 @@
 import ExpenseCard from './ExpenseCard.jsx';
-export default function ExpenseList({ expenses , deleteExpense ,  editExpense }) {
+export default function ExpenseList({ expenses , onDeleteExpense ,  onEditExpense, onSelectExpense, }) {
   return (
     <div>
       {expenses.length === 0 && (
@@ -12,8 +12,9 @@ export default function ExpenseList({ expenses , deleteExpense ,  editExpense })
             <ExpenseCard
               key={expense.id}
               expense={expense}
-              deleteExpense={deleteExpense}
-              editExpense={editExpense}
+              onDeleteExpense={onDeleteExpense}
+              onEditExpense={onEditExpense}
+              onSelectExpense={onSelectExpense}
             />
           ))}
         </>
