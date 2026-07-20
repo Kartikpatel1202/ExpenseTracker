@@ -1,0 +1,42 @@
+Level,Topic,Work To Do,Output,Difficulty
+1,Project setup,"Create React app, Express app, folder structure, environment files, and Git workflow","Running frontend and backend locally",Beginner
+1,UI layout,"Build login, dashboard shell, sidebar, topbar, and empty states","Clean responsive screens",Beginner
+1,API basics,"Create health check API and common response/error format","/api/health endpoint",Beginner
+1,MongoDB basics,"Connect Express to MongoDB using Mongoose","Successful DB connection log",Beginner
+2,Registration,"Add user registration with name, email, password","Signup API and form",Beginner
+2,Login,"Add JWT login and protected routes","Login API and frontend auth flow",Beginner
+2,Profile,"Allow user to view and update profile details","Profile page and update API",Beginner
+2,Security basics,"Hash passwords, validate input, handle auth errors","Safer auth implementation",Beginner
+3,Expense model,"Add amount, title, category, type, date, note, payment mode","Mongoose expense schema",Intermediate
+3,Expense CRUD,"Create, list, update, delete expenses","Functional expense module",Intermediate
+3,Filters,"Add search, category filter, date range, income/expense type filter","Usable expense list",Intermediate
+3,Pagination,"Add backend pagination and frontend page controls","Scalable expense listing",Intermediate
+4,Summary cards,"Show income, expense, balance, monthly spend","Dashboard metrics",Intermediate
+4,Charts,"Add category-wise and month-wise charts","Visual analytics dashboard",Intermediate
+4,MongoDB aggregation,"Build analytics APIs using aggregation pipeline","Efficient backend reports",Intermediate
+4,Export,"Add CSV export for filtered expenses","Downloadable report",Intermediate
+5,Receipt upload,"Attach image/PDF receipts to expenses","Upload API and preview",Intermediate
+5,File validation,"Validate file size and file type","Safer upload flow",Intermediate
+5,Profile image,"Add avatar upload for user profile","Image upload practice",Intermediate
+5,Storage cleanup,"Remove old files when records are deleted","Basic file lifecycle handling",Intermediate
+6,Groups,"Create groups with members","Group expense workspace",Advanced
+6,Split expense,"Split expenses equally or manually","Split calculation logic",Advanced
+6,Balances,"Show who owes whom","Settlement summary",Advanced
+6,Settle up,"Mark payments as settled","Group balance lifecycle",Advanced
+7,Socket setup,"Connect frontend and backend with Socket.IO","Live socket connection",Advanced
+7,Group chat,"Add chat inside each expense group","Real-time group messages",Advanced
+7,Message history,"Store and load previous messages from MongoDB","Persistent chat",Advanced
+7,Typing indicator,"Show typing status to group members","Better real-time UX",Advanced
+8,Browser permission,"Ask notification permission at the right time","Controlled permission flow",Advanced
+8,Expense reminders,"Notify for upcoming due or recurring expenses","Reminder notification",Advanced
+8,Split alerts,"Notify members when a split is created or settled","Collaboration alert",Advanced
+8,Notification center,"Store and list notifications inside the app","In-app notification history",Advanced
+9,Worker setup,"Add Redis and BullMQ worker process","Separate job processor",Advanced
+9,Monthly report job,"Generate monthly expense summary in the background","Async reporting job",Advanced
+9,Reminder job,"Schedule upcoming bill reminders","Scheduled notifications",Advanced
+9,Retry handling,"Add failed job logging and retry attempts","Production-style reliability",Advanced
+10,Deployment,"Deploy frontend, backend, and database","Public project URL",Advanced
+10,Seed data,"Add demo users, expenses, groups, and messages","Interview-ready demo",Advanced
+10,README polish,"Add screenshots, setup steps, features, and API list","Strong GitHub presentation",Advanced
+10,Resume summary,"Write 3-4 resume bullets and project explanation","Interview talking points",Advanced
+
