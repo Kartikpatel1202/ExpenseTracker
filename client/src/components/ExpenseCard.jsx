@@ -16,25 +16,38 @@ export default function ExpenseCard({ expense ,  onDeleteExpense , onEditExpense
     badge = "📂 Other";
   }
   return (
-    <div className="expense-card">
+    <div
+      className="expense-card"
+      onClick={() => onSelectExpense(expense)}
+    >
       <h3>{expense.title}</h3>
+
       <span className="category-badge">
         {badge}
       </span>
+
       <p>Amount: Rs. {expense.amount}</p>
       <p>Date: {expense.date}</p>
       <p>Payment Mode: {expense.paymentMode}</p>
       <p>Note: {expense.note}</p>
+
       <button
-       onClick={() => onDeleteExpense(expense.id)}
-       >
-       Delete
-      </button>
-      <button
-      onClick={() => {onSelectExpense(expense); onEditExpense(expense) }}
+      onClick={(event) => {
+      event.stopPropagation();    // Prevents the button click from triggering the parent card's onClick event.
+      onDeleteExpense(expense.id);
+      }}
       >
-      Edit
+      Delete
       </button>
+
+    <button
+    onClick={(event) => {
+    event.stopPropagation();    // Prevents the button click from triggering the parent card's onClick event.
+    onEditExpense(expense);
+    }}
+    >
+     Edit
+    </button>
     </div>
   );
 }
