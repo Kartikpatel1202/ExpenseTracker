@@ -25,7 +25,6 @@ export default function ExpenseCard({ expense ,  onDeleteExpense , onEditExpense
       <span className="category-badge">
         {badge}
       </span>
-
       <p>Amount: Rs. {expense.amount}</p>
       <p>Date: {expense.date}</p>
       <p>Payment Mode: {expense.paymentMode}</p>

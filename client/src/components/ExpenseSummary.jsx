@@ -1,13 +1,34 @@
-export default function ExpenseSummary({ expenses }) {
-  const totalAmount = expenses.reduce(
-    (sum, expense) => sum + expense.amount,
-    0
-  );
+function ExpenseSummary({
+  totalIncome,
+  totalExpense,
+  currentBalance,
+  totalExpensesCount,
+  highestExpense,
+  categoryTotals,
+}) {
   return (
-    <div>
-      <h2>Expense Summary</h2>
-      <p>Total Expenses: Rs. {totalAmount}</p>
-      <p>Number of Expenses: {expenses.length}</p>
+    <div className="financial-summary">
+      <h3>Financial Summary</h3>
+      <p>Total Income: ₹{totalIncome}</p>
+      <p>Total Expense: ₹{totalExpense}</p>
+      <p>Current Balance: ₹{currentBalance}</p>
+      <p>Total Transactions: {totalExpensesCount}</p>
+      <p>
+        Highest Expense:
+        {highestExpense
+          ? ` ${highestExpense.title} - ₹${highestExpense.amount}`
+          : " No Expense"}
+      </p>
+
+      <h3>Category-wise Totals</h3>
+      <ul>
+        {Object.entries(categoryTotals).map(([category, total]) => (
+          <li key={category}>
+            {category}: ₹{total}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
+export default ExpenseSummary;
