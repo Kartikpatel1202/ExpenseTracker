@@ -1,17 +1,29 @@
-import http from 'node:http';
-import { config } from './config/env.js';
-import { connectDatabase } from './config/db.js';
-import { createApp } from './app.js';
-import { registerSocketHandlers } from './sockets/index.js';
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import connectDB from "./config/db.js";
 
-const app = createApp();
-const server = http.createServer(app);
+dotenv.config();
 
-registerSocketHandlers(server);
+// Connect Database
+connectDB();
 
-await connectDatabase();
+const app = express();
 
-server.listen(config.port, () => {
-  console.log(`Server running on port ${config.port}`);
+app.use(cors());
+app.use(express.json());
+
+app.get("/", (req, res) => {
+  res.send("Expense Tracker Backend is Running 🚀");
+});
+app.get("/api/health", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "Server is running successfully",
+  });
 });
 
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
