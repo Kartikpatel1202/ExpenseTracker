@@ -37,7 +37,6 @@ useEffect(() => {
     // Remove error if validation passes
     setError("");
    const newExpense = {
-  id: Date.now(),
   title,
   amount: Number(amount),
   type,

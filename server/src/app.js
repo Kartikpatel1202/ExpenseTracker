@@ -7,6 +7,7 @@ import groupRoutes from './modules/groups/group.routes.js';
 import notificationRoutes from './modules/notifications/notification.routes.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
+import analyticsRoutes from "./routes/analyticsRoutes.js";
 
 export function createApp() {
   const app = express();

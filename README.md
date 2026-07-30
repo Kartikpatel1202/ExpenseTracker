@@ -20,17 +20,527 @@ A MERN training project for interns. The goal is to build a resume-ready persona
 - Notifications: Web Notifications API
 - Background Jobs: BullMQ with Redis
 
-## Directory Structure
+## Features
+
+### Backend
+- CRUD APIs
+- Filtering, Searching & Sorting
+- Summary Analytics
+- Category-wise Analytics
+- Month-wise Analytics
+- MongoDB Aggregation Pipeline
+- Validation
+- Error Handling
+- Consistent API Responses
+
+### Frontend
+- React Dashboard
+- Expense Form
+- Expense List
+- Search & Filters
+- Analytics Cards
+- Responsive UI
+
+## Folder Structure
 
 ```text
-expense-tracker-analytics/
-├── client/                 # React frontend
-├── server/                 # Express backend
-├── docs/                   # Training plans and project notes
-├── .env.example            # Shared environment reference
-├── .gitignore
-└── package.json            # Root scripts
+expense-tracker/
+├── client/
+│   ├── src/
+│   └── package.json
+├── server/
+│   ├── src/
+│   │   ├── config/
+│   │   ├── controllers/
+│   │   ├── middleware/
+│   │   ├── models/
+│   │   ├── routes/
+│   │   └── index.js
+│   ├── package.json
+│   └── .env
+└── README.md
 ```
+
+## Installation
+
+### Backend
+
+```bash
+cd server
+npm install
+npm run dev
+```
+
+### Frontend
+
+```bash
+cd client
+npm install
+npm start
+```
+
+### Environment Variables
+
+```env
+PORT=5000
+MONGO_URI=your_mongodb_connection_string
+```
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | /api/health | Health Check |
+| POST | /api/expenses | Add Expense |
+| GET | /api/expenses | Get All Expenses |
+| GET | /api/expenses/:id | Get Expense |
+| PUT | /api/expenses/:id | Update Expense |
+| DELETE | /api/expenses/:id | Delete Expense |
+| GET | /api/analytics/summary | Summary |
+| GET | /api/analytics/category-wise | Category Analytics |
+| GET | /api/analytics/month-wise | Month Analytics |
+
+# 📌 API Examples
+
+This section provides sample request bodies, success responses, and error responses for each API endpoint. These examples help developers understand how to interact with the Expense Tracker API.
+
+---
+
+# ➕ Create Expense
+
+### Endpoint
+
+```http
+POST /api/expenses
+```
+
+### Sample Request Body
+
+```json
+{
+  "title": "Salary",
+  "amount": 50000,
+  "category": "Job",
+  "type": "Income"
+}
+```
+
+### Sample Success Response
+
+```json
+{
+  "success": true,
+  "message": "Expense created successfully",
+  "data": {
+    "_id": "687abc1234567890abcdef12",
+    "title": "Salary",
+    "amount": 50000,
+    "category": "Job",
+    "type": "Income",
+    "createdAt": "2026-07-30T10:15:20.000Z",
+    "updatedAt": "2026-07-30T10:15:20.000Z"
+  }
+}
+```
+
+### Sample Error Response
+
+```json
+{
+  "success": false,
+  "message": "All fields are required",
+  "data": null
+}
+```
+
+---
+
+# 📄 Get All Expenses
+
+### Endpoint
+
+```http
+GET /api/expenses
+```
+
+### Sample Success Response
+
+```json
+{
+  "success": true,
+  "message": "Expenses fetched successfully",
+  "data": [
+    {
+      "_id": "687abc1234567890abcdef12",
+      "title": "Salary",
+      "amount": 50000,
+      "category": "Job",
+      "type": "Income"
+    },
+    {
+      "_id": "687abc1234567890abcdef13",
+      "title": "Food",
+      "amount": 650,
+      "category": "Food",
+      "type": "Expense"
+    }
+  ]
+}
+```
+
+### Sample Error Response
+
+```json
+{
+  "success": false,
+  "message": "No expenses found",
+  "data": null
+}
+```
+
+---
+
+# 🔍 Get Expense by ID
+
+### Endpoint
+
+```http
+GET /api/expenses/:id
+```
+
+### Sample Success Response
+
+```json
+{
+  "success": true,
+  "message": "Expense fetched successfully",
+  "data": {
+    "_id": "687abc1234567890abcdef12",
+    "title": "Food",
+    "amount": 650,
+    "category": "Food",
+    "type": "Expense"
+  }
+}
+```
+
+### Sample Error Response
+
+```json
+{
+  "success": false,
+  "message": "Expense not found",
+  "data": null
+}
+```
+
+---
+
+# ✏️ Update Expense
+
+### Endpoint
+
+```http
+PUT /api/expenses/:id
+```
+
+### Sample Request Body
+
+```json
+{
+  "title": "Groceries",
+  "amount": 1200,
+  "category": "Food",
+  "type": "Expense"
+}
+```
+
+### Sample Success Response
+
+```json
+{
+  "success": true,
+  "message": "Expense updated successfully",
+  "data": {
+    "_id": "687abc1234567890abcdef12",
+    "title": "Groceries",
+    "amount": 1200,
+    "category": "Food",
+    "type": "Expense"
+  }
+}
+```
+
+### Sample Error Response
+
+```json
+{
+  "success": false,
+  "message": "Invalid Expense ID",
+  "data": null
+}
+```
+
+---
+
+# ❌ Delete Expense
+
+### Endpoint
+
+```http
+DELETE /api/expenses/:id
+```
+
+### Sample Success Response
+
+```json
+{
+  "success": true,
+  "message": "Expense deleted successfully",
+  "data": {
+    "_id": "687abc1234567890abcdef12",
+    "title": "Groceries",
+    "amount": 1200,
+    "category": "Food",
+    "type": "Expense"
+  }
+}
+```
+
+### Sample Error Response
+
+```json
+{
+  "success": false,
+  "message": "Expense not found",
+  "data": null
+}
+```
+
+---
+
+# 📊 Summary Analytics
+
+### Endpoint
+
+```http
+GET /api/analytics/summary
+```
+
+### Sample Success Response
+
+```json
+{
+  "success": true,
+  "message": "Summary fetched successfully",
+  "data": {
+    "totalIncome": 100000,
+    "totalExpense": 25000,
+    "balance": 75000,
+    "totalTransactions": 18,
+    "highestExpense": {
+      "title": "House Rent",
+      "amount": 12000
+    }
+  }
+}
+```
+
+---
+
+# 📈 Category-wise Analytics
+
+### Endpoint
+
+```http
+GET /api/analytics/category-wise
+```
+
+### Sample Success Response
+
+```json
+{
+  "success": true,
+  "message": "Category-wise analytics fetched successfully",
+  "data": [
+    {
+      "_id": "Food",
+      "totalAmount": 4200
+    },
+    {
+      "_id": "Travel",
+      "totalAmount": 3500
+    },
+    {
+      "_id": "Shopping",
+      "totalAmount": 8000
+    }
+  ]
+}
+```
+
+---
+
+# 📅 Month-wise Analytics
+
+### Endpoint
+
+```http
+GET /api/analytics/month-wise
+```
+
+### Sample Success Response
+
+```json
+{
+  "success": true,
+  "message": "Month-wise analytics fetched successfully",
+  "data": [
+    {
+      "_id": {
+        "month": 6
+      },
+      "totalIncome": 50000,
+      "totalExpense": 18000
+    },
+    {
+      "_id": {
+        "month": 7
+      },
+      "totalIncome": 60000,
+      "totalExpense": 22000
+    }
+  ]
+}
+```
+
+---
+
+# ⚠️ Common Error Responses
+
+## 1. Missing Required Fields
+
+```json
+{
+  "success": false,
+  "message": "All fields are required",
+  "data": null
+}
+```
+
+---
+
+## 2. Invalid Expense ID
+
+```json
+{
+  "success": false,
+  "message": "Invalid Expense ID",
+  "data": null
+}
+```
+
+---
+
+## 3. Expense Not Found
+
+```json
+{
+  "success": false,
+  "message": "Expense not found",
+  "data": null
+}
+```
+
+---
+
+## 4. Invalid Type
+
+```json
+{
+  "success": false,
+  "message": "Type must be either Income or Expense",
+  "data": null
+}
+```
+
+---
+
+## 5. Route Not Found
+
+```json
+{
+  "success": false,
+  "message": "Route not found - /api/test",
+  "data": null
+}
+```
+
+---
+
+## 6. Internal Server Error
+
+```json
+{
+  "success": false,
+  "message": "Internal Server Error",
+  "data": null
+}
+```
+
+---
+
+## Response Format
+
+Success
+
+```json
+{
+  "success": true,
+  "message": "Operation successful",
+  "data": {}
+}
+```
+
+Error
+
+```json
+{
+  "success": false,
+  "message": "Error message",
+  "data": null
+}
+```
+
+## Validation
+
+- Required fields
+- Positive amount
+- Valid enum (Income/Expense)
+- Invalid MongoDB ObjectId
+- Route Not Found
+- Server Error Handling
+
+## Analytics
+
+- Total Income
+- Total Expense
+- Balance
+- Total Transactions
+- Highest Expense
+- Category-wise Aggregation
+- Month-wise Aggregation
+
+## Future Enhancements
+
+- JWT Authentication
+- Budget Planner
+- Charts
+- PDF Export
+- Email Reports
+- Cloud Deployment
+
+
 
 ## Required System Tools
 

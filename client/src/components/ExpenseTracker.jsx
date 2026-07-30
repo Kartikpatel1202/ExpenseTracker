@@ -4,6 +4,7 @@ import ExpenseSummary from './ExpenseSummary.jsx';
 import ExpenseList from './ExpenseList.jsx';
 import StateDemo from './StateDemo.jsx';
 import ExpenseTotals from "./ExpenseTotals";
+import axios from "axios";
 
 export default function ExpenseTracker() {
   const [expenses, setExpenses] = useState([]);
@@ -12,10 +13,42 @@ export default function ExpenseTracker() {
   console.log("ExpenseTracker Rendered");
   console.log("Current expenses:", expenses);
   const [showSummary, setShowSummary] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedExpense, setSelectedExpense] = useState(null);
   const [isEditMode, setIsEditMode] = useState(false);
-  const [sortBy, setSortBy] = useState("none");
+  
+  const [analytics, setAnalytics] = useState({
+  totalIncome: 0,
+  totalExpense: 0,
+  balance: 0,
+  totalTransactions: 0,
+  highestExpense: null,
+  categoryTotals: {},
+});
+
+  const [filters, setFilters] = useState({
+  category: "",
+  type: "",
+  search: "",
+  startDate: "",
+  endDate: "",
+  sortBy: "date",
+  order: "desc",
+});
+
+const fetchExpenses = async () => {
+  try {
+    const response = await axios.get(
+      "http://localhost:5000/api/expenses",
+      {
+        params: filters,
+      }
+    );
+    setExpenses(response.data.data);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 
 // level 11 task 73
 function saveCurrentState() {
@@ -25,31 +58,75 @@ function saveCurrentState() {
   ]);
 }
   // Level 4
-function addExpense(newExpense) {
-  saveCurrentState();
-  setExpenses((previousExpenses) => [
-    ...previousExpenses,
-    newExpense,
-  ]);
-}
-function deleteExpense(id) {
-  saveCurrentState();
-  setExpenses((previousExpenses) =>
-    previousExpenses.filter(
-      (expense) => expense.id !== id
-    )
-  );
-}
-function updateExpense(updatedExpense) {
-  saveCurrentState();
-  setExpenses((previousExpenses) =>
-    previousExpenses.map((expense) =>
-      expense.id === updatedExpense.id
-        ? updatedExpense
-        : expense
-    )
-  );
-}
+const addExpense = async (newExpense) => {
+    try {
+        console.log("Sending:", newExpense);
+        const response = await axios.post(
+            "http://localhost:5000/api/expenses",
+            newExpense
+        );
+        console.log("Success:", response.data);
+        fetchExpenses();
+    } catch (error) {
+        console.log("Status:", error.response?.status);
+        console.log("Response:", error.response?.data);
+        console.log("Sent Data:", newExpense);
+    }
+};
+const deleteExpense = async (id) => {
+    try {
+        await axios.delete(
+            `http://localhost:5000/api/expenses/${id}`
+        );
+        fetchExpenses();
+    } catch (error) {
+        console.log(error);
+    }
+};
+const updateExpense = async (updatedExpense) => {
+
+    try {
+
+        await axios.put(
+            `http://localhost:5000/api/expenses/${updatedExpense._id}`,
+            updatedExpense
+        );
+
+        fetchExpenses();
+
+    } catch (error) {
+
+        console.log(error);
+
+    }
+
+};
+const fetchAnalytics = async () => {
+  try {
+    const summaryResponse = await axios.get(
+      "http://localhost:5000/api/analytics/summary"
+    );
+
+    const categoryResponse = await axios.get(
+      "http://localhost:5000/api/analytics/category-wise"
+    );
+
+    const categoryTotals = {};
+
+    categoryResponse.data.data.forEach((item) => {
+      categoryTotals[item._id] = item.totalAmount;
+    });
+
+    setAnalytics({
+      ...summaryResponse.data.data,
+      categoryTotals,
+    });
+
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 function editExpense(expense) {
   setSelectedExpense(expense);
   setIsEditMode(true);
@@ -58,22 +135,7 @@ function editExpense(expense) {
 function selectExpense(expense) {
   setSelectedExpense(expense);
 }
-const filteredExpenses =
-  selectedCategory === "All"
-    ? expenses
-    : expenses.filter(
-        (expense) => expense.category === selectedCategory
-);
-const sortedExpenses = [...filteredExpenses];
-if (sortBy === "amount") {
-  sortedExpenses.sort((a, b) => a.amount - b.amount);
-}
 
-if (sortBy === "date") {
-  sortedExpenses.sort(
-    (a, b) => new Date(a.date) - new Date(b.date)
-  );
-}
 //level 11 task 74
 function undoLastChange() {
   if (history.length === 0) {
@@ -138,23 +200,22 @@ function getCategoryTotals(expenses) {
   }, {});
 }
 // Calculated Values 
-const totalExpense = calculateTotalExpense(expenses);
-const totalIncome = calculateTotalIncome(expenses);
-const currentBalance = calculateCurrentBalance(
-  totalIncome,
-  totalExpense
-);
-const totalExpensesCount = getTotalExpensesCount(expenses);
-const highestExpense = getHighestExpense(expenses);
-const categoryTotals = getCategoryTotals(expenses);
+const totalIncome = analytics.totalIncome;
+const totalExpense = analytics.totalExpense;
+const currentBalance = analytics.balance;
+const totalExpensesCount = analytics.totalTransactions;
+const highestExpense = analytics.highestExpense;
+const categoryTotals = analytics.categoryTotals;
 
 useEffect(() => {
   document.title = `Expenses (${totalExpensesCount})`;
 }, [totalExpensesCount]);
 
+
 useEffect(() => {
-  console.log("Selected category changed:", selectedCategory);
-}, [selectedCategory]);
+    fetchExpenses();
+    fetchAnalytics();
+}, [filters]);
 
 return (
   <div>
@@ -208,7 +269,7 @@ return (
               <li>No transactions</li>
             ) : (
               state.map((expense) => (
-                <li key={expense.id}>
+                <li key={expense._id}>
                   {expense.title} - ₹{expense.amount}
                 </li>
               ))
@@ -237,46 +298,126 @@ return (
     </div>
      )}
     
-    <h3>Sort Expenses</h3>
-    <button onClick={() => setSortBy("amount")}>
-    Sort by Amount
-    </button>
-    <button onClick={() => setSortBy("date")}>
-    Sort by Date
-    </button>
-    <button onClick={() => setSortBy("none")}>
-    Clear Sorting
-    </button>
+<h3>Sort Expenses</h3>
+<button
+  onClick={() =>
+    setFilters({
+      ...filters,
+      sortBy: "amount",
+      order: "asc",
+    })
+  }
+>
+  Sort by Amount
+</button>
+<button
+  onClick={() =>
+    setFilters({
+      ...filters,
+      sortBy: "date",
+      order: "desc",
+    })
+  }
+>
+  Sort by Date
+</button>
+<button
+  onClick={() =>
+    setFilters({
+      ...filters,
+      sortBy: "",
+      order: "desc",
+    })
+  }
+>
+  Clear Sorting
+</button>
 
-     <h3>Filter by Category</h3>
-    <button onClick={() => setSelectedCategory("All")}>
-    All
-    </button>
-    <button onClick={() => setSelectedCategory("Food")}>
-    Food
-    </button>
-    <button onClick={() => setSelectedCategory("Travel")}>
-    Travel
-    </button>
-    <button onClick={() => setSelectedCategory("Shopping")}>
-    Shopping
-    </button>
-    <button onClick={() => setSelectedCategory("Bills")}>
-    Bills
-    </button>
-   <button onClick={() => setSelectedCategory("Other")}>
-    Other
-    </button>
-    <button onClick={() => setSelectedCategory("All")}>
-    Clear Filter
-    </button>
+<h3>Filter by Category</h3>
 
-    <ExpenseList
-     expenses={sortedExpenses}
-     onDeleteExpense={deleteExpense}
-     onEditExpense={editExpense}
-     onSelectExpense={selectExpense}
-    />
+<button
+  onClick={() =>
+    setFilters({
+      ...filters,
+      category: "",
+    })
+  }
+>
+  All
+</button>
+
+<button
+  onClick={() =>
+    setFilters({
+      ...filters,
+      category: "Food",
+    })
+  }
+>
+  Food
+</button>
+
+<button
+  onClick={() =>
+    setFilters({
+      ...filters,
+      category: "Travel",
+    })
+  }
+>
+  Travel
+</button>
+
+<button
+  onClick={() =>
+    setFilters({
+      ...filters,
+      category: "Shopping",
+    })
+  }
+>
+  Shopping
+</button>
+
+<button
+  onClick={() =>
+    setFilters({
+      ...filters,
+      category: "Bills",
+    })
+  }
+>
+  Bills
+</button>
+
+<button
+  onClick={() =>
+    setFilters({
+      ...filters,
+      category: "Other",
+    })
+  }
+>
+  Other
+</button>
+
+<button
+  onClick={() =>
+    setFilters({
+      ...filters,
+      category: "",
+    })
+  }
+>
+  Clear Filter
+</button>
+
+<ExpenseList
+  expenses={expenses}
+  onDeleteExpense={deleteExpense}
+  onEditExpense={editExpense}
+  onSelectExpense={selectExpense}
+/>
     <StateDemo />
   </div>
 );
