@@ -541,6 +541,89 @@ Error
 - Cloud Deployment
 
 
+# 🌐 Frontend & Backend Integration
+
+This project has been successfully tested for seamless communication between the React frontend and Express backend.
+
+---
+
+## ✅ CORS Verification
+
+Cross-Origin Resource Sharing (CORS) has been configured successfully in the Express backend to allow requests from the React frontend.
+
+### Backend Configuration
+
+```javascript
+import cors from "cors";
+
+app.use(cors());
+```
+
+### Verification
+
+- ✔ Cross-origin requests are allowed.
+- ✔ No CORS policy errors were encountered in the browser.
+- ✔ React frontend successfully communicates with the backend APIs.
+
+---
+
+## ❤️ Backend Health API Verification
+
+A Health Check API is implemented to verify that the backend server is running properly.
+
+### Endpoint
+
+```http
+GET /api/health
+```
+
+### Sample Success Response
+
+```json
+{
+  "success": true,
+  "message": "Server is running successfully",
+  "data": {
+    "status": "Healthy"
+  }
+}
+```
+
+---
+
+## 🔗 Frontend Health API Test
+
+The React frontend successfully calls the backend Health API using Axios.
+
+### Example
+
+```javascript
+import axios from "axios";
+
+const response = await axios.get("http://localhost:5000/api/health");
+
+console.log(response.data);
+```
+
+### Expected Output
+
+```json
+{
+  "success": true,
+  "message": "Server is running successfully",
+  "data": {
+    "status": "Healthy"
+  }
+}
+```
+
+### Verification Checklist
+
+- ✔ Backend server starts successfully.
+- ✔ Health API returns HTTP 200 OK.
+- ✔ React frontend receives the response correctly.
+- ✔ No CORS-related issues.
+- ✔ Frontend and backend communication verified successfully.
 
 ## Required System Tools
 

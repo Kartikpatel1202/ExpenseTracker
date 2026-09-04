@@ -1,34 +1,66 @@
+import {
+  ArrowDownRight,
+  ArrowUpRight,
+  BarChart3,
+  CalendarDays,
+  Wallet,
+} from "lucide-react";
+import SummaryCard from "./SummaryCard.jsx";
+import { formatCurrency } from "../utils/format.js";
+
 function ExpenseSummary({
   totalIncome,
   totalExpense,
   currentBalance,
   totalExpensesCount,
   highestExpense,
-  categoryTotals,
 }) {
   return (
-    <div className="financial-summary">
-      <h3>Financial Summary</h3>
-      <p>Total Income: ₹{totalIncome}</p>
-      <p>Total Expense: ₹{totalExpense}</p>
-      <p>Current Balance: ₹{currentBalance}</p>
-      <p>Total Transactions: {totalExpensesCount}</p>
-      <p>
-        Highest Expense:
-        {highestExpense
-          ? ` ${highestExpense.title} - ₹${highestExpense.amount}`
-          : " No Expense"}
-      </p>
+    <section className="card financial-summary">
+      <div className="card-head">
+        <h3 className="card-title">Financial Summary</h3>
+        <p className="card-meta">
+          <CalendarDays size={15} />
+          Total Transactions: {totalExpensesCount}
+        </p>
+      </div>
 
-      <h3>Category-wise Totals</h3>
-      <ul>
-        {Object.entries(categoryTotals).map(([category, total]) => (
-          <li key={category}>
-            {category}: ₹{total}
-          </li>
-        ))}
-      </ul>
-    </div>
+      <div className="card-body">
+        <div className="summary-grid">
+          <SummaryCard variant="income" Icon={ArrowUpRight} label="Total Income">
+            <p className="summary-value">{formatCurrency(totalIncome)}</p>
+          </SummaryCard>
+
+          <SummaryCard variant="expense" Icon={ArrowDownRight} label="Total Expense">
+            <p className="summary-value">{formatCurrency(totalExpense)}</p>
+          </SummaryCard>
+
+          <SummaryCard variant="balance" Icon={Wallet} label="Current Balance">
+            <p
+              className={
+                currentBalance < 0 ? "summary-value is-negative" : "summary-value"
+              }
+            >
+              {formatCurrency(currentBalance)}
+            </p>
+          </SummaryCard>
+
+          <SummaryCard variant="highest" Icon={BarChart3} label="Highest Expense">
+            {highestExpense ? (
+              <>
+                <p className="summary-sub-title">{highestExpense.title}</p>
+                <p className="summary-sub-value">
+                  {formatCurrency(highestExpense.amount)}
+                </p>
+              </>
+            ) : (
+              <p className="summary-sub-title">No Expense</p>
+            )}
+          </SummaryCard>
+        </div>
+      </div>
+    </section>
   );
 }
+
 export default ExpenseSummary;

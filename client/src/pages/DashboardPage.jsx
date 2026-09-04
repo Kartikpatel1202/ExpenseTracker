@@ -7,9 +7,12 @@ const metrics = [
 export default function DashboardPage() {
   return (
     <section>
-      <header className="page-header">
-        <h2>Dashboard</h2>
-        <button type="button">Add Expense</button>
+      <header className="page-head">
+        <div>
+          <h1 className="page-title">Dashboard</h1>
+          <p className="page-subtitle">An overview of your finances at a glance</p>
+        </div>
+        <button type="button" className="btn btn-primary btn-sm">Add Expense</button>
       </header>
       <div className="metric-grid">
         {metrics.map((metric) => (
@@ -22,4 +25,3 @@ export default function DashboardPage() {
     </section>
   );
 }
-

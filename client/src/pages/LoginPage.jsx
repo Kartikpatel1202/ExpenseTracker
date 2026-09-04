@@ -4,18 +4,17 @@ export default function LoginPage() {
       <section className="auth-panel">
         <h1>Sign in</h1>
         <form>
-          <label>
-            Email
-            <input type="email" placeholder="intern@example.com" />
-          </label>
-          <label>
-            Password
-            <input type="password" placeholder="Password" />
-          </label>
-          <button type="submit">Login</button>
+          <div className="field">
+            <label htmlFor="login-email">Email</label>
+            <input id="login-email" type="email" placeholder="intern@example.com" />
+          </div>
+          <div className="field">
+            <label htmlFor="login-password">Password</label>
+            <input id="login-password" type="password" placeholder="Password" />
+          </div>
+          <button type="submit" className="btn btn-primary">Login</button>
         </form>
       </section>
     </main>
   );
 }
-
