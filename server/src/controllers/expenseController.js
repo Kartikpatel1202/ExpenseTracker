@@ -4,6 +4,14 @@ import mongoose from "mongoose";
 // Create Expense
 export const addExpense = async (req, res) => {
   try {
+    // Viewer is read-only
+    if (req.user.role === "Viewer") {
+    return res.status(403).json({
+    success: false,
+    message: "Viewers cannot create expenses",
+    data: null,
+    });
+    }
     console.log(req.body);
     const {
       title,
@@ -34,6 +42,7 @@ export const addExpense = async (req, res) => {
     // Save expense to MongoDB
     console.log("Schema Paths:", Object.keys(Expense.schema.paths));
     const expense = await Expense.create({
+      userId: req.user.userId,
       title,
       amount,
       type,
@@ -51,6 +60,11 @@ export const addExpense = async (req, res) => {
     });
 
   } catch (error) {
+      console.error("=== ADD EXPENSE ERROR ===");
+  console.error(error);
+  console.error("Error Message:", error.message);
+  console.error("Authenticated User:", req.user);
+
 
     // Handle Mongoose validation errors
     if (error.name === "ValidationError") {
@@ -89,6 +103,12 @@ export const getAllExpenses = async (req, res) => {
 
     // Filter object
     let filter = {};
+
+// User sees only own expenses.
+// Admin and Viewer see all expenses.
+   if (req.user.role === "User") {
+   filter.userId = req.user.userId;
+   } 
 
     // Category Filter
     if (category) {
@@ -158,7 +178,21 @@ export const getExpenseById = async (req, res) => {
         data: null,
     });
 }
-    const expense = await Expense.findById(id);
+    let expense;
+
+if (
+  req.user.role === "Admin" ||
+  req.user.role === "Viewer"
+) {
+  // Admin and Viewer can view any expense
+  expense = await Expense.findById(id);
+} else {
+  // Normal User can view only their own expense
+  expense = await Expense.findOne({
+    _id: id,
+    userId: req.user.userId,
+  });
+}
     // Expense not found
     if (!expense) {
       return res.status(404).json({
@@ -186,26 +220,54 @@ export const getExpenseById = async (req, res) => {
     });
   }
 };
+
 export const updateExpense = async (req, res) => {
   try {
+    const { id } = req.params;
 
-    const { id } = req.params;      //Level 7 Task 39
+    // Validate Expense ID
     if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(400).json({
+      return res.status(400).json({
         success: false,
         message: "Invalid Expense ID",
         data: null,
-    });
-}        
-    const updatedData = req.body;     //level 7 Task 40
+      });
+    }
 
+    // Viewer is read-only
+    if (req.user.role === "Viewer") {
+      return res.status(403).json({
+        success: false,
+        message: "Viewers cannot update expenses",
+        data: null,
+      });
+    }
+
+    // Find expense
     const existingExpense = await Expense.findById(id);
+
     if (!existingExpense) {
       return res.status(404).json({
         success: false,
         message: "Expense not found",
+        data: null,
       });
     }
+
+    // User can update only their own expense
+    if (
+      req.user.role !== "Admin" &&
+      existingExpense.userId.toString() !== req.user.userId.toString()
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: "You can update only your own expenses",
+        data: null,
+      });
+    }
+
+    // Never allow frontend to change ownership
+    const { userId, ...updatedData } = req.body;
 
     const updatedExpense = await Expense.findByIdAndUpdate(
       id,
@@ -223,7 +285,6 @@ export const updateExpense = async (req, res) => {
     });
 
   } catch (error) {
-
     if (error.name === "ValidationError") {
       const errors = Object.values(error.errors).map(
         (err) => err.message
@@ -240,6 +301,7 @@ export const updateExpense = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "Invalid Expense ID",
+        data: null,
       });
     }
 
@@ -253,45 +315,67 @@ export const updateExpense = async (req, res) => {
 
 export const deleteExpense = async (req, res) => {
   try {
-    // Read Expense ID
     const { id } = req.params;
+
+    // Validate Expense ID
     if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(400).json({
+      return res.status(400).json({
         success: false,
         message: "Invalid Expense ID",
         data: null,
-    });
-}
-    // Check if expense exists
+      });
+    }
+
+    // Viewer is read-only
+    if (req.user.role === "Viewer") {
+      return res.status(403).json({
+        success: false,
+        message: "Viewers cannot delete expenses",
+        data: null,
+      });
+    }
+
+    // Find expense
     const existingExpense = await Expense.findById(id);
 
     if (!existingExpense) {
       return res.status(404).json({
         success: false,
         message: "Expense not found",
+        data: null,
+      });
+    }
+
+    // User can delete only their own expense
+    if (
+      req.user.role !== "Admin" &&
+      existingExpense.userId.toString() !== req.user.userId.toString()
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: "You can delete only your own expenses",
+        data: null,
       });
     }
 
     // Delete expense
     await Expense.findByIdAndDelete(id);
 
-    // Return success response
     return res.status(200).json({
       success: true,
       message: "Expense deleted successfully",
+      data: null,
     });
 
   } catch (error) {
-
-    // Invalid MongoDB ObjectId
     if (error.name === "CastError") {
       return res.status(400).json({
         success: false,
         message: "Invalid Expense ID",
+        data: null,
       });
     }
 
-    // Internal Server Error
     return res.status(500).json({
       success: false,
       message: "Internal Server Error",

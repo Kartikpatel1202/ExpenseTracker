@@ -2,6 +2,12 @@ import mongoose from "mongoose";
 
 const expenseSchema = new mongoose.Schema(
   {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+
     title: {
       type: String,
       required: [true, "Title is required"],
@@ -50,8 +56,10 @@ const expenseSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
 console.log("=== Expense Model Loaded ===");
 console.log("Schema Keys:", Object.keys(expenseSchema.obj));
+
 const Expense = mongoose.model("Expense", expenseSchema);
 
 export default Expense;
